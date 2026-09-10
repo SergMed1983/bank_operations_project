@@ -1,8 +1,12 @@
 """Генерация JSON-ответов для веб-страниц."""
+import json
 from datetime import datetime
-from typing import Any, Optional
+from pathlib import Path
+from typing import Any
 
 import pandas as pd
+
+from api_client import get_currency_rates, get_stock_prices
 
 
 def get_greeting(dt: datetime) -> str:
@@ -106,7 +110,8 @@ def main_page(date_str: str, data: pd.DataFrame) -> dict[str, Any]:
         data: DataFrame с транзакциями
 
     Returns:
-        JSON-ответ с приветствием, картами, топ-транзакциями
+        JSON-ответ с приветствием, картами, топ-транзакциями,
+        курсами валют и ценами акций
     """
     # 1. Парсим дату
     dt = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
@@ -119,11 +124,20 @@ def main_page(date_str: str, data: pd.DataFrame) -> dict[str, Any]:
         & (data["Статус"] == "OK")
     ]
 
-    # 3. Собираем ответ
+    # 3. Загружаем настройки пользователя
+    settings_path = Path("user_settings.json")
+    with open(settings_path, "r", encoding="utf-8-sig") as f:
+        settings = json.load(f)
+
+    currencies = settings.get("user_currencies", [])
+    stocks = settings.get("user_stocks", [])
+
+    # 4. Собираем ответ
     return {
         "greeting": get_greeting(dt),
         "cards": get_cards_info(filtered),
         "top_transactions": get_top_transactions(filtered),
-        "currency_rates": [],  # TODO: добавим позже
-        "stock_prices": [],  # TODO: добавим позже
+        "currency_rates": get_currency_rates(currencies),
+        "stock_prices": get_stock_prices(stocks),
     }
+
