@@ -11,3 +11,6 @@ htmlcov/
 *.xlsx
 *.xls
 *.log
+# Отчёты
+*.json
+!user_settings.json
