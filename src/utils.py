@@ -20,13 +20,26 @@ def load_transactions(filepath: str) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    from reports import spending_by_category  # noqa: E402
+    import json
+
+    from views import main_page
 
     df = load_transactions("data/operations.xlsx")
 
-    result = spending_by_category(df, category="Супермаркеты", date="2021-12-31")
-    print("\nТраты по категории 'Супермаркеты' за последние 3 месяца:")
-    print(f"Количество транзакций: {len(result)}")
-    print(f"Общая сумма: {result['Сумма операции'].sum():.2f} руб.")
-    print("\nПервые 5 транзакций:")
-    print(result[["Дата операции", "Сумма операции", "Описание"]].head())
+    result = main_page("2021-12-31 16:44:00", df)
+
+    print("\n=== Ответ главной страницы ===")
+    print(f"\nПриветствие: {result['greeting']}")
+    print(f"\nКарты ({len(result['cards'])}):")
+    for card in result["cards"]:
+        print(f"  {card}")
+    print("\nТоп-5 транзакций:")
+    for tx in result["top_transactions"]:
+        print(
+            f"  {tx['date']} | {tx['amount']} | {tx['category']} | {tx['description']}"
+        )
+    print(f"\nCurrency rates: {result['currency_rates']}")
+    print(f"Stock prices: {result['stock_prices']}")
+
+    print("\n=== JSON ===")
+    print(json.dumps(result, ensure_ascii=False, indent=2))
