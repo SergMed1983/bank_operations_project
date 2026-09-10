@@ -1,13 +1,12 @@
 """Сервисы для анализа банковских операций."""
+
 import pandas as pd
 
 # Категории, по которым кешбэк не начисляется
 EXCLUDED_CATEGORIES = ["Переводы", "Пополнения"]
 
 
-def cashback_categories(
-    data: pd.DataFrame, year: int, month: int
-) -> dict[str, float]:
+def cashback_categories(data: pd.DataFrame, year: int, month: int) -> dict[str, float]:
     """
     Анализирует, сколько кешбэка можно заработать по каждой категории
     за указанный год и месяц.
@@ -22,16 +21,11 @@ def cashback_categories(
     """
     # 1. Фильтруем по статусу OK и по дате (год + месяц)
     filtered = data[
-        (data["Статус"] == "OK")
-        & (data["Дата операции"].dt.year == year)
-        & (data["Дата операции"].dt.month == month)
+        (data["Статус"] == "OK") & (data["Дата операции"].dt.year == year) & (data["Дата операции"].dt.month == month)
     ]
 
     # 2. Оставляем только расходы, исключая переводы и пополнения
-    expenses = filtered[
-        (filtered["Сумма операции"] < 0)
-        & (~filtered["Категория"].isin(EXCLUDED_CATEGORIES))
-    ].copy()
+    expenses = filtered[(filtered["Сумма операции"] < 0) & (~filtered["Категория"].isin(EXCLUDED_CATEGORIES))].copy()
 
     # 3. Считаем кешбэк: 1% от суммы трат
     expenses["cashback"] = expenses["Сумма операции"].abs() * 0.01

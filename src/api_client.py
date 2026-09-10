@@ -1,4 +1,5 @@
 """Клиент для работы с внешними API (валюты, акции)."""
+
 from typing import Any
 
 import requests

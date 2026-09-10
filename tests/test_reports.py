@@ -1,4 +1,5 @@
 """Тесты для reports.py."""
+
 import os
 import sys
 

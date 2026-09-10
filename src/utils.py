@@ -1,4 +1,5 @@
 """Утилиты для работы с данными из Excel-файла."""
+
 import pandas as pd
 
 
@@ -13,9 +14,7 @@ def load_transactions(filepath: str) -> pd.DataFrame:
         DataFrame с транзакциями, где 'Дата операции' — datetime
     """
     df = pd.read_excel(filepath)
-    df["Дата операции"] = pd.to_datetime(
-        df["Дата операции"], format="%d.%m.%Y %H:%M:%S", errors="coerce"
-    )
+    df["Дата операции"] = pd.to_datetime(df["Дата операции"], format="%d.%m.%Y %H:%M:%S", errors="coerce")
     return df
 
 
@@ -35,9 +34,7 @@ if __name__ == "__main__":
         print(f"  {card}")
     print("\nТоп-5 транзакций:")
     for tx in result["top_transactions"]:
-        print(
-            f"  {tx['date']} | {tx['amount']} | {tx['category']} | {tx['description']}"
-        )
+        print(f"  {tx['date']} | {tx['amount']} | {tx['category']} | {tx['description']}")
     print(f"\nCurrency rates: {result['currency_rates']}")
     print(f"Stock prices: {result['stock_prices']}")
 

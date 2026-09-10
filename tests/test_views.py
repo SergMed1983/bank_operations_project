@@ -1,4 +1,5 @@
 """Тесты для views.py."""
+
 import os
 import sys
 
@@ -9,7 +10,6 @@ from datetime import datetime  # noqa: E402
 import pandas as pd  # noqa: E402
 
 from views import get_cards_info, get_greeting, get_top_transactions  # noqa: E402
-
 
 # ---------- get_greeting ----------
 

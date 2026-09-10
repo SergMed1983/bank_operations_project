@@ -1,4 +1,5 @@
 """Отчёты по банковским операциям."""
+
 import json
 from datetime import datetime
 from functools import wraps
@@ -74,9 +75,7 @@ def spending_by_category(
     if date is None:
         end_date = datetime.now()
     else:
-        end_date = datetime.strptime(date, "%Y-%m-%d").replace(
-            hour=23, minute=59, second=59
-        )
+        end_date = datetime.strptime(date, "%Y-%m-%d").replace(hour=23, minute=59, second=59)
 
     # 2. Начало периода: 3 месяца назад
     start_date = end_date - pd.DateOffset(months=3)

@@ -1,4 +1,5 @@
 """Генерация JSON-ответов для веб-страниц."""
+
 import json
 from datetime import datetime
 from pathlib import Path
@@ -78,9 +79,7 @@ def get_top_transactions(data: pd.DataFrame, top_n: int = 5) -> list[dict[str, A
     # Исключаем переводы и пополнения, оставляем только расходы
     excluded = ["Переводы", "Пополнения"]
     filtered = data[
-        (data["Статус"] == "OK")
-        & (data["Сумма платежа"] < 0)
-        & (~data["Категория"].isin(excluded))
+        (data["Статус"] == "OK") & (data["Сумма платежа"] < 0) & (~data["Категория"].isin(excluded))
     ].copy()
 
     # Сортируем по модулю суммы платежа (крупные расходы)
@@ -119,9 +118,7 @@ def main_page(date_str: str, data: pd.DataFrame) -> dict[str, Any]:
     # 2. Фильтруем данные с начала месяца по указанную дату
     start_of_month = dt.replace(day=1, hour=0, minute=0, second=0)
     filtered = data[
-        (data["Дата операции"] >= start_of_month)
-        & (data["Дата операции"] <= dt)
-        & (data["Статус"] == "OK")
+        (data["Дата операции"] >= start_of_month) & (data["Дата операции"] <= dt) & (data["Статус"] == "OK")
     ]
 
     # 3. Загружаем настройки пользователя
@@ -140,4 +137,3 @@ def main_page(date_str: str, data: pd.DataFrame) -> dict[str, Any]:
         "currency_rates": get_currency_rates(currencies),
         "stock_prices": get_stock_prices(stocks),
     }
-

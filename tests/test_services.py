@@ -1,4 +1,5 @@
 """Тесты для services.py."""
+
 import os
 import sys
 
