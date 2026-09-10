@@ -1,4 +1,5 @@
 """Тесты для api_client.py."""
+
 import os
 import sys
 from unittest.mock import MagicMock, patch
@@ -27,7 +28,7 @@ def test_get_currency_rates_success(mock_get):
 
 @patch("api_client.requests.get")
 def test_get_currency_rates_error(mock_get):
-    """Ошибка сети → пустой список."""
+    """Ошибка сети -> пустой список."""
     import requests
 
     mock_get.side_effect = requests.RequestException("Network error")

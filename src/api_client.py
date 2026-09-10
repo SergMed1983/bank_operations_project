@@ -47,7 +47,7 @@ def get_currency_rates(currencies: list[str]) -> list[dict[str, Any]]:
                 )
         return result
 
-    except (requests.RequestException, ValueError, KeyError):
+    except requests.RequestException, ValueError, KeyError:
         return []
 
 

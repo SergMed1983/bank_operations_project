@@ -1,4 +1,4 @@
-"""Тесты для views.py."""
+﻿"""Тесты для views.py."""
 
 import os
 import sys
@@ -15,25 +15,25 @@ from views import get_cards_info, get_greeting, get_top_transactions  # noqa: E4
 
 
 def test_greeting_morning():
-    """06:00–11:59 → Доброе утро."""
+    """06:00–11:59 -> Доброе утро."""
     assert get_greeting(datetime(2021, 12, 31, 8, 0)) == "Доброе утро"
     assert get_greeting(datetime(2021, 12, 31, 11, 59)) == "Доброе утро"
 
 
 def test_greeting_day():
-    """12:00–17:59 → Добрый день."""
+    """12:00–17:59 -> Добрый день."""
     assert get_greeting(datetime(2021, 12, 31, 12, 0)) == "Добрый день"
     assert get_greeting(datetime(2021, 12, 31, 17, 59)) == "Добрый день"
 
 
 def test_greeting_evening():
-    """18:00–22:59 → Добрый вечер."""
+    """18:00–22:59 -> Добрый вечер."""
     assert get_greeting(datetime(2021, 12, 31, 18, 0)) == "Добрый вечер"
     assert get_greeting(datetime(2021, 12, 31, 22, 59)) == "Добрый вечер"
 
 
 def test_greeting_night():
-    """23:00–05:59 → Доброй ночи."""
+    """23:00–05:59 -> Доброй ночи."""
     assert get_greeting(datetime(2021, 12, 31, 23, 0)) == "Доброй ночи"
     assert get_greeting(datetime(2021, 12, 31, 3, 0)) == "Доброй ночи"
     assert get_greeting(datetime(2021, 12, 31, 5, 59)) == "Доброй ночи"

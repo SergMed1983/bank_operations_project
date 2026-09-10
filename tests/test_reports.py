@@ -59,7 +59,7 @@ def test_last_three_months_only():
     data = _make_test_data()
     result = spending_by_category(data, category="Супермаркеты", date="2021-12-31")
     # 2021-09-15 должен быть исключён (больше 3 месяцев)
-    assert len(result) == 4  # 4 транзакции: дек×2, ноя, окт
+    assert len(result) == 4  # 4 транзакции: дек x2, ноя, окт
 
 
 def test_ignores_failed():
