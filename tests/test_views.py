@@ -1,15 +1,10 @@
 ﻿"""Тесты для views.py."""
 
-import os
-import sys
+from datetime import datetime
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
+import pandas as pd
 
-from datetime import datetime  # noqa: E402
-
-import pandas as pd  # noqa: E402
-
-from views import get_cards_info, get_greeting, get_top_transactions  # noqa: E402
+from src.views import get_cards_info, get_greeting, get_top_transactions
 
 # ---------- get_greeting ----------
 
@@ -47,7 +42,7 @@ def _make_cards_data() -> pd.DataFrame:
     return pd.DataFrame(
         {
             "Статус": ["OK", "OK", "OK", "FAILED"],
-            "Сумма операции": [-1000.0, -500.0, -300.0, -200.0],
+            "Сумма платежа": [-1000.0, -500.0, -300.0, -200.0],
             "Номер карты": ["*1234", "*1234", "*5678", "*1234"],
         }
     )
@@ -116,16 +111,16 @@ def test_top_transactions_returns_5():
 
 
 def test_top_transactions_sorted_by_amount():
-    """Отсортированы по убыванию суммы."""
+    """Отсортированы по убыванию модуля суммы."""
     data = _make_top_data()
     result = get_top_transactions(data)
     amounts = [abs(tx["amount"]) for tx in result]
     assert amounts == sorted(amounts, reverse=True)
 
 
-def test_top_transactions_excludes_transfers():
-    """Переводы не попадают в топ."""
+def test_top_transactions_includes_transfers():
+    """Переводы тоже попадают в топ (см. пример ТЗ)."""
     data = _make_top_data()
     result = get_top_transactions(data)
     categories = [tx["category"] for tx in result]
-    assert "Переводы" not in categories
+    assert "Переводы" in categories

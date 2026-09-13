@@ -14,3 +14,4 @@ htmlcov/
 # Отчёты
 *.json
 !user_settings.json
+!data/operations.xlsx

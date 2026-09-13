@@ -110,9 +110,7 @@ def main_page(date_str: str, data: pd.DataFrame) -> dict[str, Any]:
     # Данные с начала месяца по указанную дату
     start_of_month = dt.replace(day=1, hour=0, minute=0, second=0)
     filtered = data[
-        (data["Дата операции"] >= start_of_month)
-        & (data["Дата операции"] <= dt)
-        & (data["Статус"] == "OK")
+        (data["Дата операции"] >= start_of_month) & (data["Дата операции"] <= dt) & (data["Статус"] == "OK")
     ]
 
     # Настройки пользователя

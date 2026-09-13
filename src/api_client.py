@@ -48,7 +48,7 @@ def get_currency_rates(currencies: list[str]) -> list[dict[str, Any]]:
                 )
         return result
 
-    except (requests.RequestException, ValueError, KeyError):
+    except requests.RequestException, ValueError, KeyError:
         return []
 
 
@@ -85,7 +85,7 @@ def get_stock_prices(stocks: list[str]) -> list[dict[str, Any]]:
                 response.raise_for_status()
                 payload = response.json()
                 price = float(payload["Global Quote"]["05. price"])
-            except (requests.RequestException, KeyError, ValueError, TypeError):
+            except requests.RequestException, KeyError, ValueError, TypeError:
                 price = None
 
         # Fallback на заглушку
