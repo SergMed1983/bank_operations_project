@@ -7,7 +7,7 @@ from typing import Any
 
 import pandas as pd
 
-from api_client import get_currency_rates, get_stock_prices
+from src.api_client import get_currency_rates, get_stock_prices
 
 
 def get_greeting(dt: datetime) -> str:
@@ -36,22 +36,21 @@ def get_cards_info(data: pd.DataFrame) -> list[dict[str, Any]]:
     Возвращает информацию по каждой карте: последние 4 цифры,
     общая сумма расходов и кешбэк (1% от суммы).
 
+    Используем 'Сумма платежа', т.к. это сумма в валюте счёта (рубли),
+    а не в оригинальной валюте транзакции.
+
     Args:
         data: DataFrame с транзакциями
 
     Returns:
         Список словарей с информацией о картах
     """
-    # Оставляем только расходы (отрицательные суммы) и статус OK
-    expenses = data[(data["Статус"] == "OK") & (data["Сумма операции"] < 0)].copy()
+    expenses = data[(data["Статус"] == "OK") & (data["Сумма платежа"] < 0)].copy()
 
-    # Группируем по номеру карты
     cards = []
     for card_number, group in expenses.groupby("Номер карты"):
-        # Берём последние 4 цифры
         digits = str(card_number).replace("*", "").strip()[-4:]
-
-        total_spent = round(float(abs(group["Сумма операции"].sum())), 2)
+        total_spent = round(float(abs(group["Сумма платежа"].sum())), 2)
         cashback = round(total_spent * 0.01, 2)
 
         cards.append(
@@ -67,7 +66,7 @@ def get_cards_info(data: pd.DataFrame) -> list[dict[str, Any]]:
 
 def get_top_transactions(data: pd.DataFrame, top_n: int = 5) -> list[dict[str, Any]]:
     """
-    Возвращает топ-N транзакций по сумме платежа (только расходы).
+    Возвращает топ-N транзакций по модулю суммы платежа.
 
     Args:
         data: DataFrame с транзакциями
@@ -76,13 +75,7 @@ def get_top_transactions(data: pd.DataFrame, top_n: int = 5) -> list[dict[str, A
     Returns:
         Список словарей с информацией о транзакциях
     """
-    # Исключаем переводы и пополнения, оставляем только расходы
-    excluded = ["Переводы", "Пополнения"]
-    filtered = data[
-        (data["Статус"] == "OK") & (data["Сумма платежа"] < 0) & (~data["Категория"].isin(excluded))
-    ].copy()
-
-    # Сортируем по модулю суммы платежа (крупные расходы)
+    filtered = data[data["Статус"] == "OK"].copy()
     filtered["abs_amount"] = filtered["Сумма платежа"].abs()
     top = filtered.nlargest(top_n, "abs_amount")
 
@@ -112,24 +105,24 @@ def main_page(date_str: str, data: pd.DataFrame) -> dict[str, Any]:
         JSON-ответ с приветствием, картами, топ-транзакциями,
         курсами валют и ценами акций
     """
-    # 1. Парсим дату
     dt = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
 
-    # 2. Фильтруем данные с начала месяца по указанную дату
+    # Данные с начала месяца по указанную дату
     start_of_month = dt.replace(day=1, hour=0, minute=0, second=0)
     filtered = data[
-        (data["Дата операции"] >= start_of_month) & (data["Дата операции"] <= dt) & (data["Статус"] == "OK")
+        (data["Дата операции"] >= start_of_month)
+        & (data["Дата операции"] <= dt)
+        & (data["Статус"] == "OK")
     ]
 
-    # 3. Загружаем настройки пользователя
-    settings_path = Path("user_settings.json")
+    # Настройки пользователя
+    settings_path = Path(__file__).parent.parent / "user_settings.json"
     with open(settings_path, "r", encoding="utf-8-sig") as f:
         settings = json.load(f)
 
     currencies = settings.get("user_currencies", [])
     stocks = settings.get("user_stocks", [])
 
-    # 4. Собираем ответ
     return {
         "greeting": get_greeting(dt),
         "cards": get_cards_info(filtered),

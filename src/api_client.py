@@ -1,5 +1,6 @@
 """Клиент для работы с внешними API (валюты, акции)."""
 
+import os
 from typing import Any
 
 import requests
@@ -47,24 +48,15 @@ def get_currency_rates(currencies: list[str]) -> list[dict[str, Any]]:
                 )
         return result
 
-    except requests.RequestException, ValueError, KeyError:
+    except (requests.RequestException, ValueError, KeyError):
         return []
 
 
 def get_stock_prices(stocks: list[str]) -> list[dict[str, Any]]:
     """
-    Заглушка: возвращает фиксированные цены акций S&P 500.
-
-    В реальном проекте здесь был бы запрос к finnhub.io.
-    Для курсовой используем заглушку — работает без ключа.
-
-    Args:
-        stocks: список тикеров (например, ["AAPL", "AMZN"])
-
-    Returns:
-        Список словарей [{"stock": "AAPL", "price": 150.12}, ...]
+    Получает цены акций через Alpha Vantage.
+    При ошибке API — падает обратно на заглушку.
     """
-    # Фиксированные цены (примерные данные из задания)
     MOCK_PRICES = {
         "AAPL": 150.12,
         "AMZN": 3173.18,
@@ -73,13 +65,34 @@ def get_stock_prices(stocks: list[str]) -> list[dict[str, Any]]:
         "TSLA": 1007.08,
     }
 
+    api_key = os.getenv("ALPHA_VANTAGE_API_KEY")
     result = []
+
     for symbol in stocks:
-        if symbol in MOCK_PRICES:
-            result.append(
-                {
-                    "stock": symbol,
-                    "price": MOCK_PRICES[symbol],
-                }
-            )
+        price: float | None = None
+
+        if api_key:
+            try:
+                response = requests.get(
+                    "https://www.alphavantage.co/query",
+                    params={
+                        "function": "GLOBAL_QUOTE",
+                        "symbol": symbol,
+                        "apikey": api_key,
+                    },
+                    timeout=10,
+                )
+                response.raise_for_status()
+                payload = response.json()
+                price = float(payload["Global Quote"]["05. price"])
+            except (requests.RequestException, KeyError, ValueError, TypeError):
+                price = None
+
+        # Fallback на заглушку
+        if price is None:
+            price = MOCK_PRICES.get(symbol)
+
+        if price is not None:
+            result.append({"stock": symbol, "price": price})
+
     return result
